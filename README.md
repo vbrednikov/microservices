@@ -20,6 +20,7 @@ docker-machine create \
     --google-machine-type f1-micro \
     --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) \
     docker-host
+
 ```
 2. Import env variables:
 ```
@@ -31,13 +32,12 @@ eval $(docker-machine env docker-host)
 gcloud compute firewall-rules create puma-server --allow=tcp:9292 --description="Allow access to web-service" --direction=IN --network=default --target-tags=docker-machine
 ```
 
-4. Build docker image:
+4. Build docker image from monolith folder:
 ```
-docker build -t reddit:latest .
+docker build -t reddit:latest monolith
 ```
 
-5. Start container:
-
+5. Start the container:
 ```
 docker run --name reddit -d --network=host reddit:latest
 ```
