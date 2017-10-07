@@ -15,7 +15,7 @@ docker-machine create \
     --driver google \
     --google-project $project_id \
     --google-zone europe-west1-b \
-    --google-machine-type g1-micro \
+    --google-machine-type g1-small \
     --google-machine-image $(gcloud compute images list --filter ubuntu-1604-lts --uri) \
     docker-host
 
@@ -23,6 +23,11 @@ docker-machine create \
 Import env variables:
 ```
 eval $(docker-machine env docker-host)
+```
+
+After all, delete the instance and reset environment variables:
+```
+docker-machine rm -f docker-host && eval $(docker-machine env -u)
 ```
 
 
@@ -45,10 +50,6 @@ docker run --name reddit -d --network=host reddit:latest
 
 6. Check http://IP:9292. IP is the IP reported by `docker-machine ls`
 
-7. After all, delete the instance:
-```
-docker-machine rm docker-host
-```
 
 
 ### Microservice approach
@@ -80,11 +81,14 @@ docker run -d --network=reddit -p 9292:9292 vbrednikov/ui:2.1
 
 4. Check web application at IP:9292, where IP is reported by `docker-machine ls`
 
+### Additional ui versions
 
-## Minimal image approach
+- **ui/Dockerfile.alpine** - Dockerfile that utilizes [Alpine Linux](https://hub.docker.com/_/alpine/), produses image of size 202M. Just replacement of original dockerfile.
+- **ui/Dockerfile.alpine-minimal** - Alpine-based image of size 55M with deleted building and compiling tools.
+
+## Minimal image approaches
 
 - Use [alpine linux](https://hub.docker.com/_/alpine/)
 - build own distro from  scratch:
   - https://docs.docker.com/engine/userguide/eng-image/baseimages/
-  - https://hub.docker.com/\_/scratch/
-
+  - build minimal distributions from scratch (e.g. compile ruby without some features)
