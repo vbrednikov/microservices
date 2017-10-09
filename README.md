@@ -86,6 +86,11 @@ docker run -d --network=reddit -p 9292:9292 vbrednikov/ui:2.1
 - **ui/Dockerfile.alpine** - Dockerfile that utilizes [Alpine Linux](https://hub.docker.com/_/alpine/), produses image of size 202M. Just replacement of original dockerfile.
 - **ui/Dockerfile.alpine-minimal** - Alpine-based image of size 55M with deleted building and compiling tools.
 
+Run the  following from the repo root folder to build this specific image:
+```
+docker build --no-cache -t vbrednikov/ui:3.0 -f ui/Dockerfile.alpine-minimal ./ui/
+```
+
 ## Minimal image approaches
 
 - Use [alpine linux](https://hub.docker.com/_/alpine/)
