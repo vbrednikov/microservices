@@ -97,3 +97,4 @@ docker build --no-cache -t vbrednikov/ui:3.0 -f ui/Dockerfile.alpine-minimal ./u
 - build own distro from  scratch:
   - https://docs.docker.com/engine/userguide/eng-image/baseimages/
   - build minimal distributions from scratch (e.g. compile ruby without some features)
+  - remove unnecessary basic packages not required to run ruby
