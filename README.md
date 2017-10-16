@@ -52,49 +52,59 @@ docker run --name reddit -d --network=host reddit:latest
 
 
 
-### Microservice approach
+## Building microservice images
 
 The app consists of `ui`,  `post-py` and `comments` microservices having each a separate Dockerfile to build from. Also, default mongo:latest machine is required.
 
 1. Prepare docker images:
 ```
 docker pull mongo:latest
-docker build -t vbrednikov/post:1.0 ./post-py
-docker build -t vbrednikov/comment:1.0 ./comment
-docker build -t vbrednikov/ui:2.1 ./ui
+docker build -t vbrednikov/post:latest ./post-py
+docker build -t vbrednikov/comment:latest ./comment
+docker build -t vbrednikov/ui:latest ./ui
 ```
 
-2. Create network:
+## Run containers for microservices manually in single network
 ```
 docker network create reddit
 ```
 
-3. Run containers
-
 ```
 docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db \
 	-v reddit_db:/data/db mongo:latest
-docker run -d --network=reddit --network-alias=post vbrednikov/post:1.0
-docker run -d --network=reddit --network-alias=comment vbrednikov/comment:1.0
-docker run -d --network=reddit -p 9292:9292 vbrednikov/ui:2.1
+docker run -d --network=reddit --network-alias=post vbrednikov/post:latest
+docker run -d --network=reddit --network-alias=comment vbrednikov/comment:latest
+docker run -d --network=reddit -p 9292:9292 vbrednikov/ui:latest
+```
+ 
+## Run containers manually in frontend and backend networks
+```
+docker network create back_net subnet=10.0.2.0/24
+docker network create front_net --subnet=10.0.1.0/24
 ```
 
-4. Check web application at IP:9292, where IP is reported by `docker-machine ls`
-
-### Additional ui versions
-
-- **ui/Dockerfile.alpine** - Dockerfile that utilizes [Alpine Linux](https://hub.docker.com/_/alpine/), produses image of size 202M. Just replacement of original dockerfile.
-- **ui/Dockerfile.alpine-minimal** - Alpine-based image of size 55M with deleted building and compiling tools.
-
-Run the  following from the repo root folder to build this specific image:
 ```
-docker build --no-cache -t vbrednikov/ui:3.0 -f ui/Dockerfile.alpine-minimal ./ui/
+docker run -d --network=back_net --network-alias=post_db --network-alias=comment_db \
+	-v reddit_db:/data/db mongo:latest
+docker run -d --network=back_net --network-alias=post vbrednikov/post:latest
+docker run -d --network=back_net --network-alias=comment vbrednikov/comment:latest
+docker run -d --network=front_net -p 9292:9292 vbrednikov/ui:latest
+
+docker network connect front_net post
+docker network connect front_net comment
 ```
 
-## Minimal image approaches
+## Bring up the environment with docker-compose
 
-- Use [alpine linux](https://hub.docker.com/_/alpine/)
-- build own distro from  scratch:
-  - https://docs.docker.com/engine/userguide/eng-image/baseimages/
-  - build minimal distributions from scratch (e.g. compile ruby without some features)
-  - remove unnecessary basic packages not required to run ruby
+1. Copy .env.example to .env, fill it with your data (at least replace USERNAME). This file will be sourced automatically.
+
+2. Run `docker-compose run -d` to build and start the containers
+
+3. To start containers with prefix different from directory name, use `-p any_string` option
+
+## Verification
+
+1. Check web application at IP:9292, where IP is reported by `docker-machine ls`
+2. Post any post
+3. Add a comment to this post
+4. Stop and start the environment with `docker-compose -p project stop`/`docker-compose -p project up -d` , make sure that post and comment are in place
