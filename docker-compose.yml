@@ -12,24 +12,24 @@ services:
           - post_db
           - comment_db
   ui:
-    image: ${USERNAME}/ui:${UI_VERSION}
+    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
     ports:
       - ${UI_PORT}:${UI_EXPOSE_PORT}/tcp
     networks:
       - front_net
   post:
-    image: ${USERNAME}/post:${POST_VERSION}
+    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
     networks:
       - back_net
       - front_net
   comment:
-    image: ${USERNAME}/comment:${COMMENT_VERSION}
+    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
     networks:
       - back_net
       - front_net
 
   prometheus:
-    image: ${USERNAME}/prometheus:${PROMETHEUS_VERSION}
+    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION}
     ports:
       - 9090:${PROMETHEUS_EXPOSE_PORT}/tcp
     networks:
