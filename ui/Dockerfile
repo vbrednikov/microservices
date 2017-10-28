@@ -3,7 +3,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY Gemfile* $APP_HOME/
 
-RUN apk update && apk add ruby ruby-json \
+RUN apk update && apk add ruby ruby-json tzdata \
     && apk add --virtual .build_deps ruby-dev g++ make ruby-bundler \
     && bundle install \
     && apk del .build_deps \
