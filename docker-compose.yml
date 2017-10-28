@@ -1,0 +1,45 @@
+version: '3.3'
+
+
+services:
+  post_db:
+    image: ${MONGO_IMAGE}:${MONGO_VERSION}
+    volumes:
+      - post_db:/data/db
+    networks:
+      back_net:
+        aliases:
+          - post_db
+          - comment_db
+  ui:
+    build: ./ui
+    image: ${USERNAME}/ui:${UI_VERSION}
+    ports:
+      - ${UI_PORT}:${UI_EXPOSE_PORT}/tcp
+    networks:
+      - front_net
+  post:
+    build: ./post-py
+    image: ${USERNAME}:${POST_VERSION}
+    networks:
+      - back_net
+      - front_net
+  comment:
+    build: ./comment
+    image: ${USERNAME}:${COMMENT_VERSION}
+    networks:
+      - back_net
+      - front_net
+volumes:
+  post_db:
+
+networks:
+  front_net:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+  back_net:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+
