@@ -10,6 +10,7 @@ services:
       back_net:
         aliases:
           - post_db
+          - mongodb
           - comment_db
   ui:
     image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
@@ -49,6 +50,13 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+
+  mongodb-exporter:
+    image: vbrednikov/mongodb-exporter:latest
+    environment:
+      MONGODB_URL: mongodb
+    networks:
+      - back_net
 
 volumes:
   post_db:
