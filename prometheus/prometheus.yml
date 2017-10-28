@@ -13,6 +13,6 @@ scrape_configs:
         - 'ui:9292'
   
   - job_name: 'comment'
-    - static_configs:
+    static_configs:
       - targets:
         - 'comment:9292'
