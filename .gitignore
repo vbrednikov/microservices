@@ -1,1 +1,4 @@
+# docker-compose configuration file
 .env
+# build identification for prometheus
+build_info.txt

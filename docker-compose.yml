@@ -10,26 +10,54 @@ services:
       back_net:
         aliases:
           - post_db
+          - mongodb
           - comment_db
   ui:
-    build: ./ui
-    image: ${USERNAME}/ui:${UI_VERSION}
+    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
     ports:
       - ${UI_PORT}:${UI_EXPOSE_PORT}/tcp
     networks:
       - front_net
   post:
-    build: ./post-py
-    image: ${USERNAME}:${POST_VERSION}
+    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
     networks:
       - back_net
       - front_net
   comment:
-    build: ./comment
-    image: ${USERNAME}:${COMMENT_VERSION}
+    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
     networks:
       - back_net
       - front_net
+
+  prometheus:
+    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION}
+    ports:
+      - 9090:${PROMETHEUS_EXPOSE_PORT}/tcp
+    networks:
+      - back_net
+      - front_net
+
+  node-exporter:
+    image: prom/node-exporter:v0.15.0
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - back_net
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+
+  mongodb-exporter:
+    image: vbrednikov/mongodb-exporter:latest
+    environment:
+      MONGODB_URL: mongodb
+    networks:
+      - back_net
+
 volumes:
   post_db:
 
