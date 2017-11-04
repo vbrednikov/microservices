@@ -52,7 +52,7 @@ services:
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
 
   mongodb-exporter:
-    image: vbrednikov/mongodb-exporter:latest
+    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:latest
     environment:
       MONGODB_URL: mongodb
     networks:
@@ -80,6 +80,14 @@ services:
       - prometheus
     ports:
       - 3000:3000
+    networks:
+      - back_net
+  alertmanager:
+    image: ${DOCKERHUB_USERNAME}/alertmanager
+    command:
+      - '-config.file=/etc/alertmanager/config.yml'
+    ports:
+      - 9093:9093
     networks:
       - back_net
       
