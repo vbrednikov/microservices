@@ -2,7 +2,7 @@ version: '3.3'
 
 
 services:
-  post_db:
+  mongo:
     image: ${MONGO_IMAGE}:${MONGO_VERSION}
     volumes:
       - post_db:/data/db
