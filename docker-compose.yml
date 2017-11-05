@@ -2,6 +2,7 @@ version: '3.3'
 
 
 services:
+
   mongo:
     image: ${MONGO_IMAGE}:${MONGO_VERSION}
     volumes:
@@ -74,20 +75,21 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=secret
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     depends_on:
       - prometheus
     ports:
-      - 3000:3000
+      - 3000:${GRAFANA_PORT}
     networks:
       - back_net
+
   alertmanager:
     image: ${DOCKERHUB_USERNAME}/alertmanager
     command:
       - '-config.file=/etc/alertmanager/config.yml'
     ports:
-      - 9093:9093
+      - 9093:${ALERTMANAGER_PORT}
     networks:
       - back_net
 
