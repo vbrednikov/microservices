@@ -90,6 +90,18 @@ services:
       - 9093:9093
     networks:
       - back_net
+
+  stackdriver_exporter:
+    build: stackdriver_exporter
+    ports:
+      - 9255:${STACKDRIVER_EXPORTER_PORT}
+    networks:
+      - back_net
+    environment:
+      - STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID=${STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID}
+      - STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES=${STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES}
+      - GOOGLE_APPLICATION_CREDENTIALS=/stackdriver.json
+
       
 volumes:
   post_db:
