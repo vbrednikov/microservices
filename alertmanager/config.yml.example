@@ -1,0 +1,11 @@
+# XXX replace with your slack api settings
+global:
+  slack_api_url: 'https://hooks.slack.com/services/XXXXX/YYYYYY/ZZZZZZZZZZZZZZZZ'
+
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+- name: 'slack-notifications'
+  slack_configs:
+  - channel: '#CHANNEL_NAME'
