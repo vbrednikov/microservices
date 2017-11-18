@@ -5,6 +5,10 @@ services:
 
   mongo:
     image: ${MONGO_IMAGE}:${MONGO_VERSION}
+    deploy:
+      placement:
+        constraints:
+          - node.labels.reliability == high
     volumes:
       - post_db:/data/db
     networks:
@@ -15,17 +19,29 @@ services:
           - comment_db
   ui:
     image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
     ports:
       - ${UI_PORT}:${UI_EXPOSE_PORT}/tcp
     networks:
       - front_net
   post:
     image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - back_net
       - front_net
   comment:
     image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - back_net
       - front_net
