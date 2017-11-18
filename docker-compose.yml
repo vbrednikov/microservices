@@ -1,6 +1,5 @@
 version: '3.3'
 
-
 services:
 
   mongo:
@@ -63,20 +62,23 @@ services:
 #      - back_net
 #      - front_net
 #
-#  node-exporter:
-#    image: prom/node-exporter:v0.15.0
-#    user: root
-#    volumes:
-#      - /proc:/host/proc:ro
-#      - /sys:/host/sys:ro
-#      - /:/rootfs:ro
-#    networks:
-#      - back_net
-#    command:
-#      - '--path.procfs=/host/proc'
-#      - '--path.sysfs=/host/sys'
-#      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-#
+
+  node-exporter:
+    image: prom/node-exporter:v0.15.0
+    user: root
+    deploy:
+      mode: global
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - back_net
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+
 #  mongodb-exporter:
 #    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:latest
 #    environment:
