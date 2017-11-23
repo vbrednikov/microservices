@@ -20,6 +20,10 @@ services:
   ui:
     image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
     deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 3s
       resources:
         limits:
           cpus: '0.25'
@@ -41,6 +45,10 @@ services:
   post:
     image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
     deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 12
+        delay: 1s
       resources:
         limits:
           cpus: '0.3'
@@ -61,6 +69,10 @@ services:
   comment:
     image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
     deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 12
+        delay: 1s
       resources:
         limits:
           cpus: '0.3'
