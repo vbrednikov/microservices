@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   mongo:
-    image: ${MONGO_IMAGE}:${MONGO_VERSION}
+    image: ${MONGO_IMAGE}:${MONGO_VERSION:-latest}
     deploy:
       placement:
         constraints:
@@ -18,7 +18,7 @@ services:
           - comment_db
 
   ui:
-    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
+    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION:-latest}
     deploy:
       restart_policy:
         condition: on-failure
@@ -27,7 +27,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: 150M      
+          memory: 150M
       mode: replicated
       replicas: 2
       update_config:
@@ -43,7 +43,7 @@ services:
       - front_net
 
   post:
-    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
+    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION:-latest}
     deploy:
       restart_policy:
         condition: on-failure
@@ -52,7 +52,7 @@ services:
       resources:
         limits:
           cpus: '0.3'
-          memory: 300M 
+          memory: 300M
       mode: replicated
       replicas: 2
       placement:
@@ -67,7 +67,7 @@ services:
       - front_net
 
   comment:
-    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
+    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION:-latest}
     deploy:
       restart_policy:
         condition: on-failure
@@ -76,7 +76,7 @@ services:
       resources:
         limits:
           cpus: '0.3'
-          memory: 300M  
+          memory: 300M
       mode: replicated
       replicas: 2
       placement:
@@ -97,9 +97,9 @@ networks:
   front_net:
     ipam:
       config:
-        - subnet: 10.0.1.0/24
+        - subnet: ${FRONT_NET}
   back_net:
     ipam:
       config:
-        - subnet: 10.0.2.0/24
+        - subnet: ${BACK_NET}
 

@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   prometheus:
-    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION}
+    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION:-latest}
     deploy:
       mode: replicated
       replicas: 1
@@ -21,7 +21,7 @@ services:
       - front_net
 
   node-exporter:
-    image: prom/node-exporter:v0.15.0
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-latest}
     user: root
     deploy:
       mode: global
@@ -45,7 +45,7 @@ services:
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
 
   mongodb-exporter:
-    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:latest
+    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:${MONGODB_EXPORTER_VERSION:-latest}
     environment:
       MONGODB_URL: mongodb
     deploy:
@@ -63,7 +63,7 @@ services:
       - back_net
 
   cadvisor:
-    image: google/cadvisor:latest
+    image: google/cadvisor:${CADVISOR_VERSION:-latest}
     deploy:
       mode: global
       restart_policy:
@@ -85,7 +85,7 @@ services:
       - back_net
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:${GRAFANA_VERSION:-latest}
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
@@ -110,7 +110,7 @@ services:
           memory: 250M
 
   alertmanager:
-    image: ${DOCKERHUB_USERNAME}/alertmanager
+    image: ${DOCKERHUB_USERNAME}/alertmanager:${ALERTMANAGER_VERSION:-latest}
     deploy:
       mode: replicated
       replicas: 1
@@ -130,7 +130,7 @@ services:
       - back_net
 
   stackdriver_exporter:
-    image: ${DOCKERHUB_USERNAME}/stackdriver_exporter:1.0
+    image: ${DOCKERHUB_USERNAME}/stackdriver_exporter:${STACKDRIVER_VERSION:-latest}
     deploy:
       mode: replicated
       replicas: 1
