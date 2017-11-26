@@ -124,9 +124,6 @@ for machine_name in master-1 worker-1; do
     --google-machine-image  ${machine_image}  \
     $machine_name
 done
-
-
-
 ```
 
 2. Init swarm, join nodes, e.g.:
