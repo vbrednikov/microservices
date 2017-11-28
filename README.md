@@ -141,15 +141,19 @@ docker-machine ssh worker-2 sudo docker swarm join --token $token $addr
 3. Label one node (e.g., master) as high-reliable to run mongo on it:
 `docker node update --label-add reliability=high master-1`
 
-4. Copy .env-example to .env, edit according to development needs.
-Please note that it is not necessary to uncomment "latest" versions since it is
-used by default.
+4. Copy .env-example to .env, edit according to development needs. Please note
+that it is not necessary to uncomment "latest" versions since value "latest" is
+used by default, if not specified.
 
 5. On production deployment host, copy .env-example to .env-prod (or any other
 suitable name). Specify network configuration and exact component versions there.
 
 6. Another option is to put components versions to `.versions` file (e.g., from
  gitlab-ci when new tag is added)
+
+7. If you are going to deploy several stacks in one cluster, be ready to specify
+different ports for the same services since the ports are overlapping in one
+cluster.
 
 Configuration is ready.
 
@@ -163,7 +167,6 @@ stack with versions specified in `.env-prod` or `.versions`.
 
 Caveats:
 - this is just proof of concept, don't treat it as production ready :)
-- do not deploy prod and dev stacks on the same cluster
 - in good production, mongo should be deployed on baremetal, currently it is in
   todo list
 - do not deploy dev and prod from the same folder since .versions will be freezed

@@ -15,7 +15,7 @@ services:
         constraints:
           - node.role == manager
     ports:
-      - 9090:${PROMETHEUS_EXPOSE_PORT}/tcp
+      - '${PROMETHEUS_EXPOSE_PORT:9090}:9090/tcp'
     networks:
       - back_net
       - front_net
@@ -80,7 +80,7 @@ services:
       - '/sys:/sys:ro'
       - '/var/lib/docker/:/var/lib/docker:ro'
     ports:
-      - '8080:8080'
+      - '${CADVISOR_PORT:-8080}:8080/tcp'
     networks:
       - back_net
 
@@ -94,7 +94,7 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3000:${GRAFANA_PORT}
+      - '${GRAFANA_PORT:-3000}:3000/tcp'
     networks:
       - back_net
     deploy:
@@ -125,7 +125,7 @@ services:
     command:
       - '-config.file=/etc/alertmanager/config.yml'
     ports:
-      - 9093:${ALERTMANAGER_PORT}
+      - '${ALERTMANAGER_PORT:-9093}:9093/tcp'
     networks:
       - back_net
 
@@ -143,7 +143,7 @@ services:
           cpus: '0.3'
           memory: 250M
     ports:
-      - 9255:${STACKDRIVER_EXPORTER_PORT}
+      - '${STACKDRIVER_EXPORTER_PORT}:9255/tcp'
     networks:
       - back_net
     environment:
