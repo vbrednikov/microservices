@@ -1,7 +1,9 @@
 # docker-compose configuration file
 .env
+.env-*
 # build identification for prometheus
 build_info.txt
 
 # private slack notification settings in alertmanager/config.yml
 alertmanager/config.yml
+.docker-compose-latest.yml

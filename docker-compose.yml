@@ -1,10 +1,13 @@
 version: '3.3'
 
-
 services:
 
   mongo:
-    image: ${MONGO_IMAGE}:${MONGO_VERSION}
+    image: ${MONGO_IMAGE}:${MONGO_VERSION:-latest}
+    deploy:
+      placement:
+        constraints:
+          - node.labels.reliability == high
     volumes:
       - post_db:/data/db
     networks:
@@ -13,108 +16,90 @@ services:
           - post_db
           - mongodb
           - comment_db
+
   ui:
-    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION}
+    image: ${DOCKERHUB_USERNAME}/ui:${UI_VERSION:-latest}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 150M
+      mode: replicated
+      replicas: 2
+      update_config:
+        delay: 5s
+        parallelism: 1
+        failure_action: rollback
+      placement:
+        constraints:
+          - node.role == worker
     ports:
-      - ${UI_PORT}:${UI_EXPOSE_PORT}/tcp
+      - '${UI_EXPOSE_PORT:-9292}${UI_PORT}/tcp'
     networks:
       - front_net
+
   post:
-    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION}
+    image: ${DOCKERHUB_USERNAME}/post:${POST_VERSION:-latest}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 12
+        delay: 1s
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == worker
+      update_config:
+        delay: 10s
+        parallelism: 2
+        failure_action: rollback
     networks:
       - back_net
       - front_net
+
   comment:
-    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION}
+    image: ${DOCKERHUB_USERNAME}/comment:${COMMENT_VERSION:-latest}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 12
+        delay: 1s
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == worker
+      update_config:
+        delay: 10s
+        parallelism: 2
+        failure_action: rollback
     networks:
       - back_net
       - front_net
 
-  prometheus:
-    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION}
-    ports:
-      - 9090:${PROMETHEUS_EXPOSE_PORT}/tcp
-    networks:
-      - back_net
-      - front_net
-
-  node-exporter:
-    image: prom/node-exporter:v0.15.0
-    user: root
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    networks:
-      - back_net
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-
-  mongodb-exporter:
-    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:latest
-    environment:
-      MONGODB_URL: mongodb
-    networks:
-      - back_net
-
-  cadvisor:
-    image: google/cadvisor:latest
-    volumes:
-      - '/:/rootfs:ro'
-      - '/var/run:/var/run:rw'
-      - '/sys:/sys:ro'
-      - '/var/lib/docker/:/var/lib/docker:ro'
-    ports:
-      - '8080:8080'
-    networks:
-      - back_net
-  grafana:
-    image: grafana/grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:${GRAFANA_PORT}
-    networks:
-      - back_net
-
-  alertmanager:
-    image: ${DOCKERHUB_USERNAME}/alertmanager
-    command:
-      - '-config.file=/etc/alertmanager/config.yml'
-    ports:
-      - 9093:${ALERTMANAGER_PORT}
-    networks:
-      - back_net
-
-  stackdriver_exporter:
-    build: stackdriver_exporter
-    ports:
-      - 9255:${STACKDRIVER_EXPORTER_PORT}
-    networks:
-      - back_net
-    environment:
-      - STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID=${STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID}
-      - STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES=${STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES}
-      - GOOGLE_APPLICATION_CREDENTIALS=/stackdriver.json
-
-      
 volumes:
   post_db:
-  grafana_data:
+
 networks:
   front_net:
     ipam:
       config:
-        - subnet: 10.0.1.0/24
+        - subnet: ${FRONT_NET}
   back_net:
     ipam:
       config:
-        - subnet: 10.0.2.0/24
+        - subnet: ${BACK_NET}
 

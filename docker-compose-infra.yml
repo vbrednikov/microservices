@@ -1,0 +1,155 @@
+version: '3.3'
+
+services:
+
+  prometheus:
+    image: ${DOCKERHUB_USERNAME}/prometheus:${PROMETHEUS_VERSION:-latest}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 3s
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - '${PROMETHEUS_EXPOSE_PORT:9090}:9090/tcp'
+    networks:
+      - back_net
+      - front_net
+
+  node-exporter:
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-latest}
+    user: root
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        delay: 2s
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 150M
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - back_net
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+
+  mongodb-exporter:
+    image: ${DOCKERHUB_USERNAME}/mongodb-exporter:${MONGODB_EXPORTER_VERSION:-latest}
+    environment:
+      MONGODB_URL: mongodb
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 150M
+    networks:
+      - back_net
+
+  cadvisor:
+    image: google/cadvisor:${CADVISOR_VERSION:-latest}
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
+    volumes:
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:rw'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+    ports:
+      - '${CADVISOR_PORT:-8080}:8080/tcp'
+    networks:
+      - back_net
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-latest}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    depends_on:
+      - prometheus
+    ports:
+      - '${GRAFANA_PORT:-3000}:3000/tcp'
+    networks:
+      - back_net
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 250M
+
+  alertmanager:
+    image: ${DOCKERHUB_USERNAME}/alertmanager:${ALERTMANAGER_VERSION:-latest}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 250M
+    command:
+      - '-config.file=/etc/alertmanager/config.yml'
+    ports:
+      - '${ALERTMANAGER_PORT:-9093}:9093/tcp'
+    networks:
+      - back_net
+
+  stackdriver_exporter:
+    image: ${DOCKERHUB_USERNAME}/stackdriver_exporter:${STACKDRIVER_VERSION:-latest}
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 3s
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 250M
+    ports:
+      - '${STACKDRIVER_EXPORTER_PORT}:9255/tcp'
+    networks:
+      - back_net
+    environment:
+      - STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID=${STACKDRIVER_EXPORTER_GOOGLE_PROJECT_ID}
+      - STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES=${STACKDRIVER_EXPORTER_MONITORING_METRICS_TYPE_PREFIXES}
+      - GOOGLE_APPLICATION_CREDENTIALS=/stackdriver.json
+
+volumes:
+  grafana_data:
