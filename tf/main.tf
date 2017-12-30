@@ -10,8 +10,8 @@ provider "google" {
 # }
 
 
-resource "google_container_cluster" "primary" {
-  name               = "macellus-wallace"
+resource "google_container_cluster" "reddit" {
+  name               = "marcellus-wallace"
   zone               = "europe-west1-b"
   initial_node_count = 3
 
@@ -34,13 +34,23 @@ resource "google_container_cluster" "primary" {
   }
 
   provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials macellus-wallace --zone ${var.zone}  --project ${var.project}"
+    command = "gcloud container clusters get-credentials marcellus-wallace --zone ${var.zone}  --project ${var.project}"
   }
+  provisioner "local-exec" {
+    command = "sleep 10"
+  }
+}
+
+resource "google_compute_disk" "reddit-mongo" {
+  name  = "reddit-mongo-disk"
+  zone  = "${var.zone}"
+  size = 25
 }
 
 provider "kubernetes" {}
 
 resource "kubernetes_namespace" "dev" {
+  depends_on=["google_container_cluster.reddit"]
   metadata {
     name = "dev"
   }
@@ -48,6 +58,7 @@ resource "kubernetes_namespace" "dev" {
 
 resource "kubernetes_secret" "ui_ingress_cert" {
   type = "kubernetes.io/tls"
+  depends_on=["kubernetes_namespace.dev"]
 
   metadata {
     name      = "ui-ingress"
