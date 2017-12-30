@@ -41,11 +41,11 @@ resource "google_container_cluster" "reddit" {
   }
 }
 
-resource "google_compute_disk" "reddit-mongo" {
-  name  = "reddit-mongo-disk"
-  zone  = "${var.zone}"
-  size = 25
-}
+# resource "google_compute_disk" "reddit-mongo" {
+#   name  = "reddit-mongo-disk"
+#   zone  = "${var.zone}"
+#   size = 25
+# }
 
 provider "kubernetes" {}
 
