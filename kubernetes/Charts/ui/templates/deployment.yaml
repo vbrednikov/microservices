@@ -23,8 +23,10 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - image: vbrednikov/ui
+      - image: "{{ .Values.image.repository }}/ui:{{ .Values.image.tag }}"
         name: ui
+        ports:
+          - containerPort: {{ .Values.service.internalPort }}
         env:
           - name: ENV
             valueFrom:
