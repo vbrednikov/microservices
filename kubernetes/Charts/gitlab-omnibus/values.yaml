@@ -9,7 +9,7 @@
 # the baseIP
 # e.g. *.your-domain.com.	A	300	baseIP
 #baseDomain: your-domain.com
-basedDomain: example.com
+baseDomain: example.com
 
 # legoEmail is a valid email address used by Let's Encrypt. It does not have to
 # be at the baseDomain.
