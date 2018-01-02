@@ -807,6 +807,13 @@ serverFiles:
             action: replace
             target_label: kubernetes_pod_name
 
+      - job_name: 'reddit-endpoints'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+
 networkPolicy:
   ## Enable creation of NetworkPolicy resources.
   ##
