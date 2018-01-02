@@ -1,6 +1,7 @@
 provider "google" {
   project = "${var.project}"
   region  = "${var.region}"
+  zone   = "${var.zone}"
 }
 
 # this doesn't work for unknown reason
