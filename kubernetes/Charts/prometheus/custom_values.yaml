@@ -807,16 +807,59 @@ serverFiles:
             action: replace
             target_label: kubernetes_pod_name
 
-      - job_name: 'reddit-endpoints'
+      # - job_name: 'reddit-endpoints'
+      #   kubernetes_sd_configs:
+      #     - role: endpoints
+      #   relabel_configs:
+      #     - action: labelmap
+      #       regex: __meta_kubernetes_service_label_(.+)
+      #     - source_labels: [__meta_kubernetes_namespace]
+      #       target_label: kubernetes_namespace
+      #     - source_labels: [__meta_kubernetes_service_name]
+      #       target_label: kubernetes_name
+
+      - job_name: 'reddit-post'
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
+          - source_labels: [__meta_kubernetes_service_label_component]
+            action: keep
+            regex: post
           - action: labelmap
             regex: __meta_kubernetes_service_label_(.+)
           - source_labels: [__meta_kubernetes_namespace]
             target_label: kubernetes_namespace
           - source_labels: [__meta_kubernetes_service_name]
             target_label: kubernetes_name
+
+      - job_name: 'reddit-comment'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_label_component]
+            action: keep
+            regex: comment
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
+            target_label: kubernetes_name
+
+      - job_name: 'reddit-ui'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_label_component]
+            action: keep
+            regex: ui
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
+            target_label: kubernetes_name
+
       - job_name: 'reddit-production'
         kubernetes_sd_configs:
           - role: endpoints
