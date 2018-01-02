@@ -30,17 +30,17 @@ mattermostAppSecret: NDl1ZjNtenMxcWR6NXZnbw==
 mattermostAppUID: aadas
 redisImage: redis:3.2.10
 redisDedicatedStorage: true
-#redisStorageSize: 5Gi
+redisStorageSize: 5Gi
 redisAccessMode: ReadWriteOnce
 postgresImage: postgres:9.6.5
 # If you disable postgresDedicatedStorage, you should consider bumping up gitlabRailsStorageSize
 postgresDedicatedStorage: true
 postgresAccessMode: ReadWriteOnce
-#postgresStorageSize: 30Gi
+postgresStorageSize: 15Gi
 gitlabDataAccessMode: ReadWriteOnce
-#gitlabDataStorageSize: 30Gi
+gitlabDataStorageSize: 20Gi
 gitlabRegistryAccessMode: ReadWriteOnce
-#gitlabRegistryStorageSize: 30Gi
+gitlabRegistryStorageSize: 10Gi
 gitlabConfigAccessMode: ReadWriteOnce
 #gitlabConfigStorageSize: 1Gi
 gitlabRunnerImage: gitlab/gitlab-runner:alpine-v10.1.0
