@@ -14,7 +14,7 @@ provider "google" {
 resource "google_container_cluster" "reddit" {
   name               = "marcellus-wallace"
   zone               = "europe-west1-b"
-  initial_node_count = 3
+  initial_node_count = 2
   # enable abac for gitlab
   enable_legacy_abac = true
 

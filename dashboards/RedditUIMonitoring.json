@@ -1,8 +1,8 @@
 {
   "__inputs": [
     {
-      "name": "DS_PROMETHEUS_SERVER",
-      "label": "Prometheus Server",
+      "name": "DS_PROMETHEUS",
+      "label": "prometheus",
       "description": "",
       "type": "datasource",
       "pluginId": "prometheus",
@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.6.1"
+      "version": "4.6.3"
     },
     {
       "type": "panel",
@@ -59,7 +59,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS_SERVER}",
+          "datasource": "${DS_PROMETHEUS}",
           "description": "All HTTP requests that UI service receives",
           "fill": 1,
           "id": 1,
@@ -87,7 +87,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "ui_request_count",
+              "expr": "ui_request_count{kubernetes_namespace=\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A"
@@ -146,7 +146,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS_SERVER}",
+          "datasource": "${DS_PROMETHEUS}",
           "fill": 1,
           "id": 2,
           "legend": {
@@ -232,7 +232,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS_SERVER}",
+          "datasource": "${DS_PROMETHEUS}",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -314,7 +314,28 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": "env",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": "label_values(namespace)",
+        "refresh": 1,
+        "regex": "/.+/",
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
     "from": "now-5m",
